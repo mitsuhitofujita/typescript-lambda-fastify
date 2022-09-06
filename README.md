@@ -4,7 +4,7 @@
 ## VSCode Remote-Containers
 
 docker compose exec -u root terraform chown 1000:999 /home/terraform/.vscode-server
-
+docker compose exec -u root node chown 1000:1000 /home/node/.vscode-server
 
 ## Prepare Terraform backend
 

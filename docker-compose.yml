@@ -1,5 +1,17 @@
 version: '3'
 services:
+  node:
+    build:
+      context: docker/node
+    container_name: ${COMPOSE_PROJECT_NAME}-node
+    ports:
+      - "3000:3000"
+    tty: true
+    user: node:node
+    volumes:
+      - ./node:/node
+      - node-vscode-server:/home/node/.vscode-server
+    working_dir: /node
   terraform:
     build:
       args:
@@ -25,4 +37,5 @@ services:
       - terraform-vscode-server:${TERRAFORM_HOME}/.vscode-server
     working_dir: ${PWD}/terraform
 volumes:
+  node-vscode-server:
   terraform-vscode-server:
