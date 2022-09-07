@@ -1,0 +1,46 @@
+# .github/workflows/aws-lambda.yml
+
+name: AWS Deploy
+on: push
+
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  aws-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set Node.js 16.x
+        uses: actions/setup-node@v2.5.1
+        with:
+          node-version: 16.x
+
+      - name: Install dependencies
+        run: cd node/hello; npm ci
+
+      - name: Rebuild the dist/ directory
+        run:  cd node/hello; npm run build
+
+      - name: Setup AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ap-northeast-1
+
+      - name: AWS Open ID Connect
+        run: aws sts get-caller-identity
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform Init
+        run: cd terraform/github-actions-aws-lambda; terraform init
+
+      - name: Terraform Plan
+        run: cd terraform/github-actions-aws-lambda; terraform plan -no-color -input=false
+
+      - name: Terraform Apply
+        run: cd terraform/github-actions-aws-lambda; terraform apply -auto-approve -input=false
